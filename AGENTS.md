@@ -14,9 +14,11 @@ Welcome to `mario-ezquerro/scope`, an actively maintained fork of Weave Scope.
    - Frontend UI: `cd client && yarn run build`
    - Docker build: Use multi-arch `docker buildx` for `marioezquerro/scope`.
 
-3. **Multi-Arch Docker Target**:
-   - DockerHub image: `marioezquerro/scope`
+3. **Multi-Arch Docker Target & Version Control**:
+   - DockerHub URL: `https://hub.docker.com/r/marioezquerro/scope/` (`marioezquerro/scope`)
+   - Mandatory versioning: Always tag release builds with semantic version tags (e.g. `v1.0.0`, `v1.0.1`) and update `latest`.
    - Supported architectures: `linux/amd64`, `linux/arm64` (Apple Silicon & Raspberry Pi 64-bit), `linux/arm/v7` (Raspberry Pi 32-bit).
+
 
 4. **Maintenance & Links**:
    - Always reference `mario-ezquerro/scope` for GitHub issues/PRs and `marioezquerro/scope` for Docker Hub images.

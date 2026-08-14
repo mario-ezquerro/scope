@@ -122,7 +122,9 @@ func RegisterReportPostHandler(a Adder, router *mux.Router) {
 
 		gzipped := strings.Contains(r.Header.Get("Content-Encoding"), "gzip")
 		if !gzipped {
-			reader = io.TeeReader(r.Body, gzip.NewWriter(buf))
+			gzWriter := gzip.NewWriter(buf)
+			reader = io.TeeReader(r.Body, gzWriter)
+			defer gzWriter.Close()
 		}
 
 		contentType := r.Header.Get("Content-Type")

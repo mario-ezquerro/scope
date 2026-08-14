@@ -39,19 +39,24 @@ Scope consists of a Go backend and a React/JS frontend, running in containerized
   - Keep UI clean and responsive.
   - Test React components with `cd client && yarn test`.
 
-## Multi-Architecture Docker Builds
+## Multi-Architecture Docker Builds & Version Control Rules
 
-Official Docker Hub image: `marioezquerro/scope:latest`
+Official Docker Hub Repository: [`https://hub.docker.com/r/marioezquerro/scope/`](https://hub.docker.com/r/marioezquerro/scope/) (`marioezquerro/scope`)
 
-Supported Architectures:
-- `linux/amd64` (x86_64)
-- `linux/arm64` (Apple Silicon M1-M4, Raspberry Pi 64-bit OS)
-- `linux/arm/v7` (Raspberry Pi 32-bit OS)
+### Version Control & Release Policy
+- **Versioning Standard**: Always maintain strict semantic versioning tags (e.g. `v1.0.0`, `v1.0.1`, `v1.1.0`) alongside the `latest` tag when building release images.
+- **Docker Hub Push Requirement**: Whenever creating a release or compiling new builds for deployment, always build and push multi-architecture images to `marioezquerro/scope`.
+- **Supported Architectures**:
+  - `linux/amd64` (x86_64 servers & desktops)
+  - `linux/arm64` (Apple Silicon M1-M4, Raspberry Pi 64-bit OS)
+  - `linux/arm/v7` (Raspberry Pi 32-bit OS)
 
-Building Multi-Arch Images with Docker Buildx:
+### Multi-Arch Build & Push Command
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64,linux/arm/v7 \
   -t marioezquerro/scope:latest \
+  -t marioezquerro/scope:v1.0.0 \
   -f docker/Dockerfile.scope . --push
 ```
+

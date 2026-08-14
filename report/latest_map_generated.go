@@ -1,5 +1,5 @@
 // Generated file, do not edit.
-// To regenerate, run ../extras/generate_latest_map ./latest_map_generated.go string
+// To regenerate, run ./extras/generate_latest_map ./report/latest_map_generated.go string
 
 package report
 
@@ -16,7 +16,59 @@ type stringLatestEntry struct {
 	key       string
 	Timestamp time.Time `json:"timestamp"`
 	Value     string    `json:"value"`
-	dummySelfer
+}
+
+// CodecEncodeSelf implements codec.Selfer.
+func (e *stringLatestEntry) CodecEncodeSelf(encoder *codec.Encoder) {
+	z, r := codec.GenHelperEncoder(encoder)
+	if e == nil {
+		r.EncodeNil()
+		return
+	}
+	r.EncodeMapStart(2)
+	z.EncSendContainerState(containerMapKey)
+	r.EncodeString(cUTF8, "timestamp")
+	z.EncSendContainerState(containerMapValue)
+	encoder.Encode(e.Timestamp)
+	z.EncSendContainerState(containerMapKey)
+	r.EncodeString(cUTF8, "value")
+	z.EncSendContainerState(containerMapValue)
+	encoder.Encode(e.Value)
+	z.EncSendContainerState(containerMapEnd)
+}
+
+// CodecDecodeSelf implements codec.Selfer.
+func (e *stringLatestEntry) CodecDecodeSelf(decoder *codec.Decoder) {
+	z, r := codec.GenHelperDecoder(decoder)
+	if r.TryDecodeAsNil() {
+		return
+	}
+	length := r.ReadMapStart()
+	for i := 0; length < 0 || i < length; i++ {
+		if length < 0 && r.CheckBreak() {
+			break
+		}
+		z.DecSendContainerState(containerMapKey)
+		var k string
+		if !r.TryDecodeAsNil() {
+			k = r.DecodeString()
+		}
+		z.DecSendContainerState(containerMapValue)
+		switch k {
+		case "timestamp":
+			if !r.TryDecodeAsNil() {
+				decoder.Decode(&e.Timestamp)
+			}
+		case "value":
+			if !r.TryDecodeAsNil() {
+				decoder.Decode(&e.Value)
+			}
+		default:
+			var ignored interface{}
+			decoder.Decode(&ignored)
+		}
+	}
+	z.DecSendContainerState(containerMapEnd)
 }
 
 // String returns the StringLatestEntry's string representation.

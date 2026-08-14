@@ -9,9 +9,11 @@ import (
 	"github.com/ugorji/go/codec"
 )
 
+type _Node Node // just so we don't recurse inside CodecEncodeSelf and CodecDecodeSelf
+
 // For backwards-compatibility with probes that sent a map of latestControls data
 type bcNode struct {
-	Node
+	_Node
 	LatestControls map[string]nodeControlDataLatestEntry `json:"latestControls,omitempty"`
 	Counters       map[string]int                        `json:"counters,omitempty"`
 }
@@ -29,7 +31,7 @@ type nodeControlData struct {
 func (n *Node) CodecDecodeSelf(decoder *codec.Decoder) {
 	var in bcNode
 	decoder.Decode(&in)
-	*n = in.Node
+	*n = Node(in._Node)
 	if len(in.LatestControls) > 0 {
 		// Convert the map into a delimited string
 		cs := make([]string, 0, len(in.LatestControls))
@@ -50,8 +52,6 @@ func (n *Node) CodecDecodeSelf(decoder *codec.Decoder) {
 		*n = n.AddCounter(k, v)
 	}
 }
-
-type _Node Node // just so we don't recurse inside CodecEncodeSelf
 
 // CodecEncodeSelf implements codec.Selfer
 func (n *Node) CodecEncodeSelf(encoder *codec.Encoder) {

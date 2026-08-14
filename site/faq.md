@@ -51,11 +51,13 @@ OSS Scope has no user concept. To limit the access to the UI,
 
   Note that there is no standard programmatic way of expiring a session with Basic Auth, so the users would normally stayed logged in until the authentication params have changed. See [this article](https://en.wikipedia.org/wiki/Basic_access_authentication#Security) for more details.
 
-## ARM Support
+## Multi-Architecture & ARM Support
 
-- It required patches, @adivyoseph (on [#scope](https://weave-community.slack.com/messages/scope/)) had done some work on this.
-- [#2110](https://github.com/weaveworks/scope/issues/2110) says that scope's CI builds ARM32 (but not ARM64) for test-builds at least.
-- @errordeveloper says: It should be easy to add arm64 in CI, You can try and enable builds in ci on a branch.. In theory, you just need to build for `GOARCH=arm64`.
+Native multi-architecture Docker images are published at [`marioezquerro/scope`](https://hub.docker.com/r/marioezquerro/scope) supporting:
+- **x86_64 / amd64**
+- **arm64** (Apple Silicon M1/M2/M3/M4 & Raspberry Pi 64-bit OS)
+- **arm/v7** (Raspberry Pi 32-bit OS)
+
 
 ## LDAP Support
 

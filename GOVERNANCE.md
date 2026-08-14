@@ -46,7 +46,7 @@ Non-specification-related PRs may be merged after receiving at least two organiz
 
 ## Github Project Administration
 
-Maintainers will be given write access to the [weaveworks/scope](https://github.com/weaveworks/scope) GitHub repository.
+Maintainers will be given write access to the [mario-ezquerro/scope](https://github.com/mario-ezquerro/scope) GitHub repository.
 
 ## Changes in Governance
 

@@ -1,15 +1,42 @@
-FROM weaveworks/cloud-agent
-RUN apk add --no-cache runit
-COPY ./weave ./weaveutil /usr/bin/
-COPY ./runsvinit ./entrypoint.sh /home/weave/
-COPY ./run-app /etc/service/app/run
-COPY ./run-probe /etc/service/probe/run
+# Stage 1: Build Scope & runsvinit binaries
+FROM golang:1.21-alpine AS builder
+
+RUN apk add --no-cache git make libpcap-dev gcc musl-dev bash linux-headers
+
+WORKDIR /go/src/github.com/mario-ezquerro/scope
+
+COPY . .
+
+# Ensure static UI assets exist/are generated
+RUN mkdir -p client/build client/build-external && \
+    touch client/build/index.html client/build-external/index.html && \
+    mkdir -p prog/staticui prog/externalui && \
+    go run -mod vendor github.com/mjibson/esc -o prog/staticui/staticui.go -pkg staticui -prefix client/build client/build && \
+    go run -mod vendor github.com/mjibson/esc -o prog/externalui/externalui.go -pkg externalui -prefix client/build-external -include '\.html$' client/build-external
+
+ARG revision=unknown
+RUN go build -mod vendor -ldflags "-extldflags \"-static\" -X main.version=${revision} -s -w" -tags 'netgo osusergo unsafe' -o /home/weave/scope ./prog
+RUN go build -mod vendor -ldflags "-extldflags \"-static\" -s -w" -tags 'netgo osusergo unsafe' -o /home/weave/runsvinit ./vendor/github.com/peterbourgon/runsvinit
+
+# Stage 2: Runtime image
+FROM alpine:3.18
+WORKDIR /home/weave
+
+RUN apk add --no-cache bash conntrack-tools iproute2 util-linux curl runit ca-certificates
+
+COPY --from=builder /home/weave/scope /home/weave/runsvinit /home/weave/
+COPY ./docker/entrypoint.sh /home/weave/
+COPY ./docker/run-app /etc/service/app/run
+COPY ./docker/run-probe /etc/service/probe/run
+
 EXPOSE 4040
 ENTRYPOINT ["/home/weave/entrypoint.sh"]
 
 ARG revision
-LABEL maintainer="Weaveworks <help@weave.works>" \
+LABEL maintainer="Mario Ezquerro <marioezquerro>" \
       org.opencontainers.image.title="scope" \
-      org.opencontainers.image.source="https://github.com/weaveworks/scope" \
+      org.opencontainers.image.source="https://github.com/mario-ezquerro/scope" \
       org.opencontainers.image.revision="${revision}" \
-      org.opencontainers.image.vendor="Weaveworks"
+      org.opencontainers.image.vendor="Mario Ezquerro"
+
+

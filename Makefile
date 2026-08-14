@@ -2,7 +2,7 @@
 
 # If you can use Docker without being root, you can `make SUDO= <target>`
 SUDO=$(shell docker info >/dev/null 2>&1 || echo "sudo -E")
-DOCKERHUB_USER=weaveworks
+DOCKERHUB_USER ?= marioezquerro
 SCOPE_EXE=prog/scope
 SCOPE_EXPORT=scope.tar
 CLOUD_AGENT_EXPORT=cloud-agent.tar
@@ -67,9 +67,15 @@ docker/%: %
 	$(SUDO) docker tag $(DOCKERHUB_USER)/$* $(DOCKERHUB_USER)/$*:$(IMAGE_TAG)
 	$(SUDO) docker save $(DOCKERHUB_USER)/$*:latest > $@
 
-$(CLOUD_AGENT_EXPORT): docker/Dockerfile.cloud-agent docker/$(SCOPE_EXE) docker/weave docker/weaveutil
+PLATFORMS ?= linux/amd64,linux/arm64,linux/arm/v7
 
-$(SCOPE_EXPORT): docker/Dockerfile.scope $(CLOUD_AGENT_EXPORT) docker/$(RUNSVINIT) docker/run-app docker/run-probe docker/entrypoint.sh
+docker-multiarch:
+	docker buildx build --platform $(PLATFORMS) --build-arg=revision=$(GIT_REVISION) -t $(DOCKERHUB_USER)/scope:latest -t $(DOCKERHUB_USER)/scope:$(IMAGE_TAG) -f docker/Dockerfile.scope docker/ --push
+
+$(CLOUD_AGENT_EXPORT): docker/Dockerfile.cloud-agent docker/$(SCOPE_EXE)
+
+$(SCOPE_EXPORT): docker/Dockerfile.scope docker/$(SCOPE_EXE) docker/$(RUNSVINIT) docker/run-app docker/run-probe docker/entrypoint.sh
+
 
 $(RUNSVINIT): vendor/github.com/peterbourgon/runsvinit/*.go
 

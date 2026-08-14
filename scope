@@ -10,7 +10,7 @@ else
     IMAGE_VERSION="$SCRIPT_VERSION"
 fi
 IMAGE_VERSION=${VERSION:-$IMAGE_VERSION}
-DOCKERHUB_USER=${DOCKERHUB_USER:-weaveworks}
+DOCKERHUB_USER=${DOCKERHUB_USER:-marioezquerro}
 SCOPE_IMAGE_NAME="$DOCKERHUB_USER/scope"
 SCOPE_IMAGE="$SCOPE_IMAGE_NAME:$IMAGE_VERSION"
 # Careful: it's easy to operate on (e.g. stop) the wrong scope instance

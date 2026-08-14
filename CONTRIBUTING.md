@@ -71,7 +71,7 @@ You can run the Go linting and unit tests by simply doing
 make tests
 ```
 
-There are integration tests for Scope, but unfortunately it's hard to set them up in forked repositories and the setup is not documented. Help is needed to improve this situation: [#2192](https://github.com/weaveworks/scope/issues/2192)
+There are integration tests for Scope, but unfortunately it's hard to set them up in forked repositories and the setup is not documented. Help is needed to improve this situation: [#2192](https://github.com/mario-ezquerro/scope/issues/2192)
 
 ### Frontend
 

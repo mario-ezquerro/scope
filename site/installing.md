@@ -24,11 +24,12 @@ Weave Scope consists of three parts: the probe, the app and the user interface.
 
 To install Scope on a single node, run the following commands:
 
-    sudo curl -L git.io/scope -o /usr/local/bin/scope
+    sudo curl -L https://raw.githubusercontent.com/mario-ezquerro/scope/master/scope -o /usr/local/bin/scope
     sudo chmod a+x /usr/local/bin/scope
     scope launch
 
-This script downloads and runs a recent Scope image from Docker Hub. Scope needs to be installed onto every machine that you want to monitor.
+This script downloads and runs a recent Scope image from Docker Hub (`marioezquerro/scope:latest`). Scope needs to be installed onto every machine that you want to monitor.
+
 
 After Scope is installed, open your browser to `http://localhost:4040`.
 
@@ -94,7 +95,7 @@ After it’s been launched, open your browser to `http://localhost:4040`.
 **Docker Compose Format Version 1:**
 
     scope:
-      image: weaveworks/scope:1.13.2
+      image: marioezquerro/scope:latest
       net: "host"
       pid: "host"
       privileged: true
@@ -110,7 +111,7 @@ After it’s been launched, open your browser to `http://localhost:4040`.
     version: '2'
     services:
       scope:
-        image: weaveworks/scope:1.13.2
+        image: marioezquerro/scope:latest
         network_mode: "host"
         pid: "host"
         privileged: true
@@ -132,15 +133,15 @@ Version 2 of this YAML file supports networks and volumes as defined by any plug
 >
 >     kubectl create clusterrolebinding "cluster-admin-$(whoami)" --clusterrole=cluster-admin --user="$(gcloud config get-value core/account)"
 
-To install Weave Scope on your Kubernetes cluster, run
+To install Scope on your Kubernetes cluster, run
 
-    kubectl apply -f https://github.com/weaveworks/scope/releases/download/v1.13.2/k8s-scope.yaml
+    kubectl apply -f https://raw.githubusercontent.com/mario-ezquerro/scope/master/examples/k8s/k8s-scope.yaml
 
 This downloads a recent Scope image from Dockerhub and launches a probe onto every node as well as a single Scope app. Once launched, Scope doesn’t require any other configuration.
 
 Allowable parameters for the launcher URL:
 
-- `v` - Weave Scope version or tag, e.g. `latest` current release is the default
+- `v` - Scope version or tag, e.g. `latest` current release is the default
 - `k8s-service-type` - Kubernetes service type (for running Scope in Standalone mode), can be either
 `LoadBalancer` or `NodePort`, by default this is unspecified (only internal access)
 
@@ -165,9 +166,10 @@ A simple way to get Scope running in a Kubernetes setting is to
 1. Clone the Scope repo:
 
    ```sh
-   git clone https://github.com/weaveworks/scope
+   git clone https://github.com/mario-ezquerro/scope
    cd scope
    ```
+
 
 1. Run
 

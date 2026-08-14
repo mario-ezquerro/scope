@@ -1,20 +1,23 @@
-# DEPRECATED: Weave Scope - Troubleshooting & Monitoring for Docker & Kubernetes
+# Scope - Troubleshooting & Monitoring for Docker & Kubernetes
 
-[![Circle CI](https://circleci.com/gh/weaveworks/scope/tree/master.svg?style=shield)](https://circleci.com/gh/weaveworks/scope/tree/master)
-[![Coverage Status](https://coveralls.io/repos/weaveworks/scope/badge.svg)](https://coveralls.io/r/weaveworks/scope)
-[![Go Report Card](https://goreportcard.com/badge/github.com/weaveworks/scope)](https://goreportcard.com/report/github.com/weaveworks/scope)
-[![Docker Pulls](https://img.shields.io/docker/pulls/weaveworks/scope.svg?maxAge=604800)](https://hub.docker.com/r/weaveworks/scope/)
-[![GoDoc](https://godoc.org/github.com/weaveworks/scope?status.svg)](https://godoc.org/github.com/weaveworks/scope)
-[![Good first issues](https://img.shields.io/github/issues/weaveworks/scope/good-first-issue.svg?color=blueviolet&label=good%20first%20issues)](https://github.com/weaveworks/scope/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue)
+[![Build & Multi-Arch Docker](https://github.com/mario-ezquerro/scope/actions/workflows/docker-multiarch.yml/badge.svg)](https://github.com/mario-ezquerro/scope/actions/workflows/docker-multiarch.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mario-ezquerro/scope)](https://goreportcard.com/report/github.com/mario-ezquerro/scope)
+[![Docker Pulls](https://img.shields.io/docker/pulls/marioezquerro/scope.svg?maxAge=604800)](https://hub.docker.com/r/marioezquerro/scope/)
 
-## PLEASE NOTE, THIS PROJECT IS NO LONGER MAINTAINED. More details [available here](https://www.weave.works/blog/weave-cloud-end-of-service).
+> **Maintained Fork Notice**: This repository is an actively maintained fork of Weave Scope by [Mario Ezquerro](https://github.com/mario-ezquerro). It includes updated dependencies, multi-architecture Docker image support (**x86_64**, **Apple Silicon / ARM64**, and **Raspberry Pi / ARM64 & ARMv7**), and ongoing bug fixes.
 
-Weave Scope automatically generates a map of your application, enabling you to
-intuitively understand, monitor, and control your containerized, microservices-based application.
+Scope automatically generates a map of your application, enabling you to intuitively understand, monitor, and control your containerized, microservices-based application.
+
+## Multi-Architecture Support
+
+Official Docker Hub images are available at [`marioezquerro/scope`](https://hub.docker.com/r/marioezquerro/scope), supporting:
+- **x86_64 / amd64** (Standard Linux servers and desktop environments)
+- **arm64** (Apple Silicon M1/M2/M3/M4 & Raspberry Pi 64-bit OS)
+- **arm/v7** (Raspberry Pi 32-bit OS)
 
 ## Understand your Docker containers in real time
 
-<img src="imgs/topology.png" width="200" alt="Map you architecture" align="right">
+<img src="imgs/topology.png" width="200" alt="Map your architecture" align="right">
 
 Choose an overview of your container infrastructure, or focus on a specific microservice. Easily identify and correct issues to ensure the stability and performance of your containerized applications.
 
@@ -22,7 +25,7 @@ Choose an overview of your container infrastructure, or focus on a specific micr
 
 <img src="imgs/selected.png" width="200" alt="Focus on a single container" align="right">
 
-View contextual metrics, tags, and metadata for your containers.  Effortlessly navigate between processes inside your container to hosts your containers run on, arranged in expandable, sortable tables.  Easily find the container using the most CPU or memory for a given host or service.
+View contextual metrics, tags, and metadata for your containers. Effortlessly navigate between processes inside your container to hosts your containers run on, arranged in expandable, sortable tables. Easily find the container using the most CPU or memory for a given host or service.
 
 ## Interact with and manage containers
 
@@ -32,54 +35,43 @@ Interact with your containers directly: pause, restart, and stop containers. Lau
 
 ## Extend and customize via plugins
 
-Add custom details or interactions for your hosts, containers, and/or processes by creating Scope plugins. Or, just choose from some that others have already written at the GitHub [Weaveworks Scope Plugins](https://github.com/weaveworks-plugins/) organization.
-
-## Who is using Scope in production
-
-- [Apester](https://apester.com/)
-- [Deepfence](https://deepfence.io) in [ThreatMapper](https://github.com/deepfence/ThreatMapper) and [ThreatStryker](https://deepfence.io/threatstryker/)
-- [MayaData](https://mayadata.io/) in [MayaOnline / MayaOnPrem](https://mayadata.io/products)
-- [Weaveworks](https://www.weave.works/) in [Weave Cloud](https://cloud.weave.works)
-
-If you would like to see your name added, let us know on Slack, or send a PR please.
+Add custom details or interactions for your hosts, containers, and/or processes by creating Scope plugins.
 
 ## <a name="getting-started"></a>Getting Started
 
-**Ensure your computer is behind a firewall that blocks port 4040** then,
+**Ensure your computer is behind a firewall that blocks port 4040**, then run:
 
 ```console
-sudo curl -L git.io/scope -o /usr/local/bin/scope
+sudo curl -L https://raw.githubusercontent.com/mario-ezquerro/scope/master/scope -o /usr/local/bin/scope
 sudo chmod a+x /usr/local/bin/scope
 scope launch
 ```
 
-This script downloads and runs a recent Scope image from Docker Hub.
+This script automatically downloads and runs the appropriate multi-arch Scope image (`marioezquerro/scope:latest`) from Docker Hub.
 Now, open your web browser to **<http://localhost:4040>**.
 
-For instructions on installing Scope on [Kubernetes](https://www.weave.works/docs/scope/latest/installing/#k8s), [DCOS](https://www.weave.works/docs/scope/latest/installing/#dcos), or [ECS](https://www.weave.works/docs/scope/latest/installing/#ecs), see [the docs](https://www.weave.works/docs/scope/latest/introducing/).
+### Running directly with Docker
 
-## <a name="help"></a>Reach Out
+```console
+docker run -d --name=weavescope \
+  --privileged \
+  --net=host \
+  --pid=host \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /sys/kernel/debug:/sys/kernel/debug \
+  marioezquerro/scope:latest
+```
 
-We are a very friendly community and love questions, help and feedback.
+## <a name="help"></a>Reach Out & Contributing
 
-If you have any questions, feedback, or problems with Scope:
+We welcome questions, feedback, and contributions!
 
-- Docs
-  - Read [the Weave Scope docs](https://www.weave.works/docs/scope/latest/introducing/)
+- Docs & Information
   - Check out the [frequently asked questions](/site/faq.md)
   - Learn more about how the [Scope community operates](GOVERNANCE.md)
-- Join the discussion
-  - Invite yourself to the <a href="https://slack.weave.works/" target="_blank">Weave community</a> Slack
-  - Ask a question on the [#scope](https://weave-community.slack.com/messages/scope/) Slack channel
-  - Send an email to [Scope community group](https://groups.google.com/forum/#!forum/scope-community)
-- Meetings and events
-  - Join the [Weave User Group](https://www.meetup.com/pro/Weave/) and get invited to online talks, hands-on training and meetups in your area
-  - Join (and read up on) the regular [Scope community meetings](https://docs.google.com/document/d/103_60TuEkfkhz_h2krrPJH8QOx-vRnPpbcCZqrddE1s/edit) - currently on hold.
 - Contributing
   - Find out how to [contribute to Scope](CONTRIBUTING.md)
-  - [File an issue](https://github.com/weaveworks/scope/issues/new) or make a pull request for one of our [good first issues](https://github.com/weaveworks/scope/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue)
-
-Your feedback is always welcome!
+  - [File an issue](https://github.com/mario-ezquerro/scope/issues/new) or make a pull request on [mario-ezquerro/scope](https://github.com/mario-ezquerro/scope).
 
 We follow the [CNCF Code of Conduct](CODE-OF-CONDUCT.md).
 
@@ -87,3 +79,4 @@ We follow the [CNCF Code of Conduct](CODE-OF-CONDUCT.md).
 
 Scope is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.  
 Find more details about the licenses of vendored code in [VENDORED_CODE.md](VENDORED_CODE.md).
+

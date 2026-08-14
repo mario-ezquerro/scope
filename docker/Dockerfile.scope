@@ -1,16 +1,19 @@
 # Stage 1: Build Scope & runsvinit binaries
 FROM golang:1.21-alpine AS builder
 
-RUN apk add --no-cache git make libpcap-dev gcc musl-dev bash linux-headers
+RUN apk add --no-cache git make libpcap-dev gcc musl-dev bash linux-headers nodejs npm yarn
 
 WORKDIR /go/src/github.com/mario-ezquerro/scope
 
 COPY . .
 
-# Ensure static UI assets exist/are generated
-RUN mkdir -p client/build client/build-external && \
-    touch client/build/index.html client/build-external/index.html && \
-    mkdir -p prog/staticui prog/externalui && \
+# Build React UI static assets
+RUN cd client && yarn install --ignore-engines && \
+    NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.production.config.js && \
+    EXTERNAL=true NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.production.config.js
+
+# Embed UI static assets into Go code
+RUN mkdir -p prog/staticui prog/externalui && \
     go run -mod vendor github.com/mjibson/esc -o prog/staticui/staticui.go -pkg staticui -prefix client/build client/build && \
     go run -mod vendor github.com/mjibson/esc -o prog/externalui/externalui.go -pkg externalui -prefix client/build-external -include '\.html$' client/build-external
 
@@ -38,5 +41,6 @@ LABEL maintainer="Mario Ezquerro <marioezquerro>" \
       org.opencontainers.image.source="https://github.com/mario-ezquerro/scope" \
       org.opencontainers.image.revision="${revision}" \
       org.opencontainers.image.vendor="Mario Ezquerro"
+
 
 

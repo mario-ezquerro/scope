@@ -1,3 +1,24 @@
+## Release 1.0.5 (mario-ezquerro/scope)
+
+- **Integrated Weave Net Fallback Overlay Provider**: Added fallback mock status in probe when Weave router is not running on port 6784, immediately rendering interactive router peers, fastdp connections, IPAM, and DNS entries in the Weave Net topology view.
+
+## Release 1.0.4 (mario-ezquerro/scope)
+
+- **Weave Net Toggle Switch in UI**: Added interactive ON/OFF toggle button in the top navigation bar and troubleshooting menu to dynamically control the visibility of the Weave Net overlay topology with URL/state persistence.
+
+## Release 1.0.3 (mario-ezquerro/scope)
+
+- **Branding & Logo Update**: Integrated Gubernator logo isotype in UI header and tuned `SCOPE` text color to 50% light grey (`#808080`) for clear readability across light and dark backgrounds.
+- **Empty Topology Hiding**: Enabled `HideIfEmpty` on sub-topologies to keep navigation clean when metrics are empty.
+
+## Release 1.0.2 (mario-ezquerro/scope)
+
+- **Backend Deserializer Recursion Fix**: Fixed infinite recursion and panic in MsgPack/JSON decoder (`report/backcompat.go`) by decoupling node embedding alias `_Node` in `bcNode`.
+
+## Release 1.0.1 (mario-ezquerro/scope)
+
+- **Multi-Architecture Docker Builds**: Added multi-platform Docker buildx workflow for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` targeting `marioezquerro/scope`.
+
 ## Release 1.13.2
 
 Mostly updates to dependencies, plus a couple of small improvements.

@@ -33,7 +33,7 @@ export default function Logo({ transform = '' }) {
       <text
         x="245"
         y="145"
-        fill="#FFFFFF"
+        fill="#808080"
         fontSize="105"
         fontWeight="800"
         letterSpacing="12"

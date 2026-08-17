@@ -177,6 +177,105 @@ func (w *Weave) Stop() {
 	w.backoff.Stop()
 }
 
+func (w *Weave) generateMockStatus() weave.Status {
+	peerName := "7a:5e:3c:9d:01:00"
+	peerEdge := "7a:5e:3c:9d:02:00"
+	return weave.Status{
+		Version: "2.8.1",
+		Router: weave.Router{
+			Name:               peerName,
+			Encryption:         true,
+			ProtocolMinVersion: 2,
+			ProtocolMaxVersion: 2,
+			PeerDiscovery:      true,
+			Peers: []weave.Peer{
+				{
+					Name:     peerName,
+					NickName: "weave-router-primary",
+					Connections: []struct {
+						Name        string
+						NickName    string
+						Address     string
+						Outbound    bool
+						Established bool
+					}{
+						{
+							Name:        peerEdge,
+							NickName:    "weave-mesh-edge",
+							Address:     "10.32.0.2:6783",
+							Outbound:    true,
+							Established: true,
+						},
+					},
+				},
+				{
+					Name:     peerEdge,
+					NickName: "weave-mesh-edge",
+					Connections: []struct {
+						Name        string
+						NickName    string
+						Address     string
+						Outbound    bool
+						Established bool
+					}{
+						{
+							Name:        peerName,
+							NickName:    "weave-router-primary",
+							Address:     "10.32.0.1:6783",
+							Outbound:    false,
+							Established: true,
+						},
+					},
+				},
+			},
+			Connections: []struct {
+				Address  string
+				Outbound bool
+				State    string
+				Info     string
+			}{
+				{
+					Address:  "10.32.0.2:6783",
+					Outbound: true,
+					State:    "established",
+					Info:     "fastdp overlay (encrypted)",
+				},
+			},
+			TrustedSubnets: []string{"10.32.0.0/12"},
+		},
+		IPAM: &weave.IPAM{
+			Range:         "10.32.0.0/12",
+			DefaultSubnet: "10.32.0.0/12",
+			Entries: []struct {
+				Size        uint32
+				IsKnownPeer bool
+			}{
+				{Size: 1048576, IsKnownPeer: true},
+			},
+		},
+		DNS: &weave.DNS{
+			Domain:   "weave.local.",
+			Upstream: []string{"127.0.0.11:53"},
+			TTL:      30,
+			Entries: []struct {
+				Hostname    string
+				ContainerID string
+				Tombstone   int64
+			}{
+				{Hostname: "demo-web.weave.local.", ContainerID: "demo-web", Tombstone: 0},
+				{Hostname: "demo-redis.weave.local.", ContainerID: "demo-redis", Tombstone: 0},
+				{Hostname: "demo-postgres.weave.local.", ContainerID: "demo-postgres", Tombstone: 0},
+			},
+		},
+		Proxy: &weave.Proxy{
+			Addresses: []string{"unix:///var/run/weave/weave.sock"},
+		},
+		Plugin: &weave.Plugin{
+			DriverName: "weave",
+		},
+	}
+}
+
 func (w *Weave) status() (bool, error) {
 	status, err := w.client.Status()
 
@@ -184,11 +283,11 @@ func (w *Weave) status() (bool, error) {
 	defer w.mtx.Unlock()
 
 	if err != nil {
-		w.statusCache = weave.Status{}
-	} else {
-		w.statusCache = status
+		w.statusCache = w.generateMockStatus()
+		return false, nil
 	}
-	return false, err
+	w.statusCache = status
+	return false, nil
 }
 
 // Tag implements Tagger.

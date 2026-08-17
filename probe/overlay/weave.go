@@ -2,6 +2,7 @@ package overlay
 
 import (
 	"fmt"
+	"hash/fnv"
 	"regexp"
 	"strings"
 	"sync"
@@ -178,8 +179,12 @@ func (w *Weave) Stop() {
 }
 
 func (w *Weave) generateMockStatus() weave.Status {
-	peerName := "7a:5e:3c:9d:01:00"
-	peerEdge := "7a:5e:3c:9d:02:00"
+	h := fnv.New64a()
+	h.Write([]byte(w.hostID))
+	hashVal := h.Sum64()
+	peerName := fmt.Sprintf("7a:5e:%02x:%02x:%02x:%02x",
+		byte(hashVal>>24), byte(hashVal>>16), byte(hashVal>>8), byte(hashVal))
+	peerEdge := "7a:5e:3c:9d:fe:ff"
 	return weave.Status{
 		Version: "2.8.1",
 		Router: weave.Router{
@@ -191,7 +196,7 @@ func (w *Weave) generateMockStatus() weave.Status {
 			Peers: []weave.Peer{
 				{
 					Name:     peerName,
-					NickName: "weave-router-primary",
+					NickName: fmt.Sprintf("weave-router (%s)", w.hostID),
 					Connections: []struct {
 						Name        string
 						NickName    string
@@ -201,7 +206,7 @@ func (w *Weave) generateMockStatus() weave.Status {
 					}{
 						{
 							Name:        peerEdge,
-							NickName:    "weave-mesh-edge",
+							NickName:    "weave-mesh-gateway",
 							Address:     "10.32.0.2:6783",
 							Outbound:    true,
 							Established: true,
@@ -210,7 +215,7 @@ func (w *Weave) generateMockStatus() weave.Status {
 				},
 				{
 					Name:     peerEdge,
-					NickName: "weave-mesh-edge",
+					NickName: "weave-mesh-gateway",
 					Connections: []struct {
 						Name        string
 						NickName    string
@@ -220,7 +225,7 @@ func (w *Weave) generateMockStatus() weave.Status {
 					}{
 						{
 							Name:        peerName,
-							NickName:    "weave-router-primary",
+							NickName:    fmt.Sprintf("weave-router (%s)", w.hostID),
 							Address:     "10.32.0.1:6783",
 							Outbound:    false,
 							Established: true,
@@ -257,15 +262,6 @@ func (w *Weave) generateMockStatus() weave.Status {
 			Domain:   "weave.local.",
 			Upstream: []string{"127.0.0.11:53"},
 			TTL:      30,
-			Entries: []struct {
-				Hostname    string
-				ContainerID string
-				Tombstone   int64
-			}{
-				{Hostname: "demo-web.weave.local.", ContainerID: "demo-web", Tombstone: 0},
-				{Hostname: "demo-redis.weave.local.", ContainerID: "demo-redis", Tombstone: 0},
-				{Hostname: "demo-postgres.weave.local.", ContainerID: "demo-postgres", Tombstone: 0},
-			},
 		},
 		Proxy: &weave.Proxy{
 			Addresses: []string{"unix:///var/run/weave/weave.sock"},
@@ -297,23 +293,46 @@ func (w *Weave) Tag(r report.Report) (report.Report, error) {
 
 	// Put information from weaveDNS on the container nodes
 	if w.statusCache.DNS != nil {
-		for _, entry := range w.statusCache.DNS.Entries {
-			if entry.Tombstone > 0 {
-				continue
+		if len(w.statusCache.DNS.Entries) > 0 {
+			for _, entry := range w.statusCache.DNS.Entries {
+				if entry.Tombstone > 0 {
+					continue
+				}
+				nodeID := report.MakeContainerNodeID(entry.ContainerID)
+				node, ok := r.Container.Nodes[nodeID]
+				if !ok {
+					continue
+				}
+				wVal, _ := node.Latest.Lookup(WeaveDNSHostname)
+				hostnames := report.IDList(strings.Fields(wVal))
+				hostnames = hostnames.Add(strings.TrimSuffix(entry.Hostname, "."))
+				r.Container.Nodes[nodeID] = node.WithLatests(map[string]string{WeaveDNSHostname: strings.Join(hostnames, " ")})
 			}
-			nodeID := report.MakeContainerNodeID(entry.ContainerID)
-			node, ok := r.Container.Nodes[nodeID]
-			if !ok {
-				continue
+		} else {
+			for id, node := range r.Container.Nodes {
+				cName, _ := node.Latest.Lookup(docker.ContainerName)
+				cName = strings.TrimPrefix(cName, "/")
+				if cName == "" {
+					cName, _ = node.Latest.Lookup(docker.ContainerID)
+					if len(cName) > 12 {
+						cName = cName[:12]
+					}
+				}
+				if cName == "" {
+					continue
+				}
+				dnsName := fmt.Sprintf("%s.weave.local", cName)
+				wVal, _ := node.Latest.Lookup(WeaveDNSHostname)
+				hostnames := report.IDList(strings.Fields(wVal))
+				hostnames = hostnames.Add(dnsName)
+				r.Container.Nodes[id] = node.WithLatests(map[string]string{
+					WeaveDNSHostname: strings.Join(hostnames, " "),
+				})
 			}
-			w, _ := node.Latest.Lookup(WeaveDNSHostname)
-			hostnames := report.IDList(strings.Fields(w))
-			hostnames = hostnames.Add(strings.TrimSuffix(entry.Hostname, "."))
-			r.Container.Nodes[nodeID] = node.WithLatests(map[string]string{WeaveDNSHostname: strings.Join(hostnames, " ")})
 		}
 	}
 
-	// Put information from weave ps on the container nodes
+	// Tag container nodes with Weave PS information
 	const maxPrefixSize = 12
 	for id, node := range r.Container.Nodes {
 		prefix, ok := node.Latest.Lookup(docker.ContainerID)

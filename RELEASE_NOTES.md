@@ -8,6 +8,15 @@ Docker Hub Oficial: [hub.docker.com/r/marioezquerro/scope](https://hub.docker.co
 
 ## 📋 Resumen de Versiones y Cambios
 
+### [v1.0.7] - 2026-08-17
+#### 🐛 Corrección Multi-Host y Entornos Remotos
+- **Identificador Único de Peer por Host (`7a:5e:hash(hostID)`)**:
+  - Solucionado el problema en despliegues con múltiples servidores/hosts donde los nodos de Weave Net colisionaban por usar el mismo ID estático. Ahora cada sonda/host genera su propio Peer MAC único derivado del `hostID`.
+- **Descubrimiento Dinámico de Contenedores**:
+  - La sonda detecta dinámicamente cualquier contenedor activo en cualquier host o servidor remoto y lo etiqueta automáticamente en Weave Net (`<nombre_contenedor>.weave.local`).
+
+---
+
 ### [v1.0.6] - 2026-08-17
 #### 🎨 UI & Contraste
 - **Fijación del Color Gris en el Texto del Logo (`SCOPE`) en Todos los Modos**:

@@ -1,3 +1,7 @@
+## Release 1.0.7 (mario-ezquerro/scope)
+
+- **Multi-Host Weave Net Fix**: Generate deterministic unique peer IDs per host (`7a:5e:hash(hostID)`) to prevent ID collisions on multi-host/remote deployments, and dynamically tag all running containers with `<container_name>.weave.local`.
+
 ## Release 1.0.6 (mario-ezquerro/scope)
 
 - **Logo Text Contrast in All Themes**: Fixed text color for `SCOPE` in header logo with explicit SVG style and CSS override to ensure consistent 50% grey (`#808080`) across Light Mode, Dark Mode, and High Contrast mode.

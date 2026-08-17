@@ -296,10 +296,11 @@ func MakeRegistry() *Registry {
 			Rank:     4,
 		},
 		APITopologyDesc{
-			id:       weaveID,
-			parent:   hostsID,
-			renderer: render.WeaveRenderer,
-			Name:     "Weave Net",
+			id:          weaveID,
+			parent:      hostsID,
+			renderer:    render.WeaveRenderer,
+			Name:        "Weave Net",
+			HideIfEmpty: true,
 		},
 	)
 

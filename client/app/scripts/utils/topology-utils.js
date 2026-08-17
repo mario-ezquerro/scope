@@ -129,9 +129,19 @@ export function setTopologyUrlsById(topologyUrlsById, topologies) {
 
 export function filterHiddenTopologies(topologies, currentTopology) {
   currentTopology = currentTopology || makeMap();
-  return topologies.filter(t => (!t.hide_if_empty || t.stats.node_count > 0
-                               || t.stats.filtered_nodes > 0 || t.id === currentTopology.get('id')
-                               || t.id === currentTopology.get('parentId')));
+  return topologies
+    .filter(t => (!t.hide_if_empty
+      || (t.stats && (t.stats.node_count > 0 || t.stats.filtered_nodes > 0))
+      || t.id === currentTopology.get('id')
+      || t.id === currentTopology.get('parentId')))
+    .map((t) => {
+      if (t.sub_topologies) {
+        return Object.assign({}, t, {
+          sub_topologies: filterHiddenTopologies(t.sub_topologies, currentTopology)
+        });
+      }
+      return t;
+    });
 }
 
 export function getCurrentTopologyOptions(state) {

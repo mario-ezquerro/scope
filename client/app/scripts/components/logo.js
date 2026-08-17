@@ -31,9 +31,11 @@ export default function Logo({ transform = '' }) {
 
       {/* Text SCOPE */}
       <text
+        className="logo-text"
         x="245"
         y="145"
         fill="#808080"
+        style={{ fill: '#808080' }}
         fontSize="105"
         fontWeight="800"
         letterSpacing="12"

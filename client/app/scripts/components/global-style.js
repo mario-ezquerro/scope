@@ -237,6 +237,10 @@ const GlobalStyle = createGlobalStyle`
           height: 64px;
           max-width: 250px;
           min-width: 0;
+
+          text, .logo-text {
+            fill: #808080 !important;
+          }
         }
       }
     }

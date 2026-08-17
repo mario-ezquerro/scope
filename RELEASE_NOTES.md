@@ -8,6 +8,14 @@ Docker Hub Oficial: [hub.docker.com/r/marioezquerro/scope](https://hub.docker.co
 
 ## 📋 Resumen de Versiones y Cambios
 
+### [v1.0.6] - 2026-08-17
+#### 🎨 UI & Contraste
+- **Fijación del Color Gris en el Texto del Logo (`SCOPE`) en Todos los Modos**:
+  - Aplicada regla CSS estricta (`.logo text, .logo .logo-text { fill: #808080 !important; }`) y `style={{ fill: '#808080' }}` en `client/app/scripts/components/logo.js` y `global-style.js`.
+  - Garantiza que la palabra `SCOPE` permanezca visible en gris claro 50% tanto en modo claro (*Light Mode*) como en modo oscuro (*Dark Mode*) o alto contraste.
+
+---
+
 ### [v1.0.5] - 2026-08-17
 #### 🌟 Novedades y Mejoras
 - **Emulador/Simulador de Topología Weave Net Integrado**:

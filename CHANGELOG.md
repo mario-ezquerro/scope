@@ -1,3 +1,7 @@
+## Release 1.0.6 (mario-ezquerro/scope)
+
+- **Logo Text Contrast in All Themes**: Fixed text color for `SCOPE` in header logo with explicit SVG style and CSS override to ensure consistent 50% grey (`#808080`) across Light Mode, Dark Mode, and High Contrast mode.
+
 ## Release 1.0.5 (mario-ezquerro/scope)
 
 - **Integrated Weave Net Fallback Overlay Provider**: Added fallback mock status in probe when Weave router is not running on port 6784, immediately rendering interactive router peers, fastdp connections, IPAM, and DNS entries in the Weave Net topology view.

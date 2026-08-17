@@ -73,6 +73,7 @@ export const initialState = makeMap({
   // list of node filters
   pinnedSearches: makeList(),
   plugins: makeList(),
+  rawTopologies: null,
   routeSet: false,
   searchFocused: false,
   searchQuery: '',
@@ -81,6 +82,7 @@ export const initialState = makeMap({
   showingHelp: false,
   showingNetworks: false,
   showingTroubleshootingMenu: false,
+  showWeaveNet: false,
   storeViewState: true,
   timeTravelTransitioning: false,
   topologies: makeList(),
@@ -119,7 +121,9 @@ function processTopologies(state, nextTopologies) {
   // add IDs to topology objects in-place
   const topologiesWithId = updateTopologyIds(nextTopologies);
   // filter out hidden topos
-  const visibleTopologies = filterHiddenTopologies(topologiesWithId, state.get('currentTopology'));
+  const visibleTopologies = filterHiddenTopologies(
+    topologiesWithId, state.get('currentTopology'), state.get('showWeaveNet')
+  );
   // set `selectType` field for topology and sub_topologies options (recursive).
   const topologiesWithSelectType = visibleTopologies.map(calcSelectType);
   // cache URLs by ID
@@ -636,6 +640,7 @@ export function rootReducer(state = initialState, action) {
 
     case ActionTypes.RECEIVE_TOPOLOGIES: {
       state = state.set('errorUrl', null);
+      state = state.set('rawTopologies', action.topologies);
       state = state.update('topologyUrlsById', topologyUrlsById => topologyUrlsById.clear());
       state = processTopologies(state, action.topologies);
       const currentTopologyId = state.get('currentTopologyId');
@@ -697,6 +702,9 @@ export function rootReducer(state = initialState, action) {
       if (action.state.contrastMode !== undefined) {
         state = state.set('contrastMode', action.state.contrastMode);
       }
+      if (action.state.showWeaveNet !== undefined) {
+        state = state.set('showWeaveNet', action.state.showWeaveNet);
+      }
       if (action.state.showingNetworks) {
         state = state.set('showingNetworks', action.state.showingNetworks);
       }
@@ -730,6 +738,14 @@ export function rootReducer(state = initialState, action) {
 
     case ActionTypes.TOGGLE_TROUBLESHOOTING_MENU: {
       return state.set('showingTroubleshootingMenu', !state.get('showingTroubleshootingMenu'));
+    }
+
+    case ActionTypes.TOGGLE_WEAVE_NET: {
+      state = state.set('showWeaveNet', action.value);
+      if (state.get('rawTopologies')) {
+        state = processTopologies(state, state.get('rawTopologies'));
+      }
+      return state;
     }
 
     case ActionTypes.CHANGE_INSTANCE: {

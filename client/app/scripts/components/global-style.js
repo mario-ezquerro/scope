@@ -373,6 +373,49 @@ const GlobalStyle = createGlobalStyle`
         padding: 2px 8px;
       }
 
+      .topologies-item-weave-toggle {
+        pointer-events: all;
+        display: flex;
+        align-items: center;
+        margin: 0px 8px;
+        height: 28px;
+        color: ${scopeTheme('textSecondaryColor')};
+        ${btnOpacity};
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: ${borderRadius('soft')};
+        border: 1px solid ${scopeTheme('backgroundDarkerColor')};
+        font-size: ${fontSize('small')};
+        white-space: nowrap;
+        user-select: none;
+
+        .weave-switch-badge {
+          font-size: 10px;
+          font-weight: bold;
+          padding: 2px 6px;
+          margin-left: 6px;
+          border-radius: 10px;
+          background: #444;
+          color: #aaa;
+          transition: all 0.2s ease;
+        }
+
+        &-active {
+          color: ${scopeTheme('textColor')};
+          border-color: ${color('blue400')};
+
+          .weave-switch-badge {
+            background: #FF5F00;
+            color: #fff;
+          }
+        }
+
+        &:hover {
+          color: ${scopeTheme('textColor')};
+          background-color: ${scopeTheme('backgroundDarkerColor')};
+        }
+      }
+
     }
 
     .nodes-chart-overlay {

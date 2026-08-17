@@ -461,3 +461,14 @@ export function setStoreViewState(storeViewState) {
     type: ActionTypes.SET_STORE_VIEW_STATE
   };
 }
+
+export function toggleWeaveNet() {
+  return (dispatch, getState) => {
+    const nextValue = !getState().get('showWeaveNet');
+    dispatch({
+      type: ActionTypes.TOGGLE_WEAVE_NET,
+      value: nextValue
+    });
+    updateRoute(getState);
+  };
+}

@@ -127,17 +127,20 @@ export function setTopologyUrlsById(topologyUrlsById, topologies) {
   return urlMap;
 }
 
-export function filterHiddenTopologies(topologies, currentTopology) {
+export function filterHiddenTopologies(topologies, currentTopology, showWeaveNet = false) {
   currentTopology = currentTopology || makeMap();
   return topologies
     .filter(t => (!t.hide_if_empty
       || (t.stats && (t.stats.node_count > 0 || t.stats.filtered_nodes > 0))
+      || (showWeaveNet && (t.id === 'weave' || t.name === 'Weave Net'))
       || t.id === currentTopology.get('id')
       || t.id === currentTopology.get('parentId')))
     .map((t) => {
       if (t.sub_topologies) {
         return Object.assign({}, t, {
-          sub_topologies: filterHiddenTopologies(t.sub_topologies, currentTopology)
+          sub_topologies: filterHiddenTopologies(
+            t.sub_topologies, currentTopology, showWeaveNet
+          )
         });
       }
       return t;

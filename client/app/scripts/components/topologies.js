@@ -6,6 +6,7 @@ import { trackAnalyticsEvent } from '../utils/tracking-utils';
 import { searchMatchCountByTopologySelector } from '../selectors/search';
 import { isResourceViewModeSelector } from '../selectors/topology';
 import { clickTopology } from '../actions/request-actions';
+import { toggleWeaveNet } from '../actions/app-actions';
 
 
 function basicTopologyInfo(topology, searchMatchCount) {
@@ -27,6 +28,11 @@ class Topologies extends React.Component {
       topologyId: topology.get('id'),
     });
     this.props.clickTopology(ev.currentTarget.getAttribute('rel'));
+  }
+
+  handleWeaveToggleClick = (ev) => {
+    ev.preventDefault();
+    this.props.toggleWeaveNet();
   }
 
   renderSubTopology(subTopology) {
@@ -58,11 +64,13 @@ class Topologies extends React.Component {
     const topologyId = topology.get('id');
     const isActive = topology === this.props.currentTopology;
     const searchMatchCount = this.props.searchMatchCountByTopology.get(topology.get('id')) || 0;
-    const className = classnames(`tour-step-anchor topologies-item-main topologies-item-${topologyId}`, {
-      'topologies-item-main-active': isActive,
-      // Don't show matches in the resource view as searching is not supported there yet.
-      'topologies-item-main-matched': !this.props.isResourceViewMode && searchMatchCount,
-    });
+    const className = classnames(
+      `tour-step-anchor topologies-item-main topologies-item-${topologyId}`, {
+        'topologies-item-main-active': isActive,
+        // Don't show matches in the resource view as searching is not supported there yet.
+        'topologies-item-main-matched': !this.props.isResourceViewMode && searchMatchCount,
+      }
+    );
     const title = basicTopologyInfo(topology, searchMatchCount);
 
     return (
@@ -85,9 +93,27 @@ class Topologies extends React.Component {
   }
 
   render() {
+    const { showWeaveNet } = this.props;
+    const toggleTitle = showWeaveNet
+      ? 'Weave Net: Activado (Clic para ocultar)'
+      : 'Weave Net: Desactivado (Clic para activar)';
+
     return (
       <div className="tour-step-anchor topologies-selector">
         {this.props.currentTopology && this.props.topologies.map(t => this.renderTopology(t))}
+        <div
+          className={classnames('topologies-item-weave-toggle', {
+            'topologies-item-weave-toggle-active': showWeaveNet
+          })}
+          onClick={this.handleWeaveToggleClick}
+          title={toggleTitle}
+        >
+          <i className="fa fa-project-diagram" style={{ marginRight: 6 }} />
+          <span>Weave Net</span>
+          <span className="weave-switch-badge">
+            {showWeaveNet ? 'ON' : 'OFF'}
+          </span>
+        </div>
       </div>
     );
   }
@@ -98,11 +124,12 @@ function mapStateToProps(state) {
     currentTopology: state.get('currentTopology'),
     isResourceViewMode: isResourceViewModeSelector(state),
     searchMatchCountByTopology: searchMatchCountByTopologySelector(state),
+    showWeaveNet: state.get('showWeaveNet'),
     topologies: state.get('topologies'),
   };
 }
 
 export default connect(
   mapStateToProps,
-  { clickTopology }
+  { clickTopology, toggleWeaveNet }
 )(Topologies);

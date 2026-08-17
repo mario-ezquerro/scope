@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import {
   toggleTroubleshootingMenu,
+  toggleWeaveNet,
   resetLocalViewState,
   clickDownloadGraph
 } from '../actions/app-actions';
@@ -21,12 +22,31 @@ class DebugMenu extends React.Component {
   }
 
   render() {
-    const { pausedAt } = this.props;
+    const { pausedAt, showWeaveNet } = this.props;
     return (
       <div className="troubleshooting-menu-wrapper">
         <div className="troubleshooting-menu">
           <div className="troubleshooting-menu-content">
             <h3>Debugging/Troubleshooting</h3>
+            <div className="troubleshooting-menu-item">
+              <button
+                type="button"
+                className="footer-icon"
+                onClick={this.props.toggleWeaveNet}
+                title="Activar / Desactivar topología Weave Net"
+              >
+                <i className="fa fa-project-diagram" />
+                <span className="description">
+                  {showWeaveNet ? 'Ocultar vista Weave Net' : 'Mostrar vista Weave Net'}
+                </span>
+                <span className="soft">
+                  {' '}
+                  (
+                  {showWeaveNet ? 'ON' : 'OFF'}
+                  )
+                </span>
+              </button>
+            </div>
             <div className="troubleshooting-menu-item">
               <a
                 className="footer-icon"
@@ -98,11 +118,13 @@ class DebugMenu extends React.Component {
 function mapStateToProps(state) {
   return {
     pausedAt: state.get('pausedAt'),
+    showWeaveNet: state.get('showWeaveNet'),
   };
 }
 
 export default connect(mapStateToProps, {
   clickDownloadGraph,
   resetLocalViewState,
-  toggleTroubleshootingMenu
+  toggleTroubleshootingMenu,
+  toggleWeaveNet,
 })(DebugMenu);

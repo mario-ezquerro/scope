@@ -101,6 +101,10 @@ export function getUrlState(state) {
     topologyViewMode: state.get('topologyViewMode'),
   };
 
+  if (state.get('showWeaveNet')) {
+    urlState.showWeaveNet = true;
+  }
+
   if (state.get('showingNetworks')) {
     urlState.showingNetworks = true;
     if (state.get('pinnedNetwork')) {
